@@ -51,7 +51,7 @@
                     const current_time_zulu = new Date().toISOString().substring(0, 16).replace(/-|:|T/g, '').substring(2) + "Z";
 
                     // Create METAR string
-                    const metar_str = `METAR GB-0199 AUTO ${current_time_zulu} ${wind_direction_str}${wind_speed_str}KT ${realtemp}/${realdew} Q${Math.round(pressure)}`;
+                    const metar_str = `METAR EGBM AUTO ${current_time_zulu} ${wind_direction_str}${wind_speed_str}KT ${realtemp}/${realdew} Q${Math.round(pressure)} QFE${Math.round(pressure)-15}`;
 
                     // Display METAR string
                     document.getElementById('metar-display').textContent = metar_str;
