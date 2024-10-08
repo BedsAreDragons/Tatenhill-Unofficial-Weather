@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather Request</title>
+</head>
+<body>
+    <h1>Weather Data</h1>
+
+    <!-- Button to request weather -->
+    <button onclick="requestWeather()">Request Weather</button>
+
+    <!-- Display the METAR -->
+    <p id="metar-display"></p>
+
+    <!-- Embed for METAR Tatenhill Airfield -->
+    <a href="https://metar-taf.com/EGBM" id="metartaf-TpeekKsh" style="font-size:18px; font-weight:500; color:#000; width:300px; height:435px; display:block">
+        METAR Tatenhill Airfield
+    </a>
+    <script async defer crossorigin="anonymous" src="https://metar-taf.com/embed-js/EGBM?u=51727&bg_color=000000&qnh=hPa&rh=rh&target=TpeekKsh"></script>
+
+    <script>
+        function requestWeather() {
+            const url = "https://api.open-meteo.com/v1/forecast?latitude=52.70672&longitude=-1.75119&hourly=temperature_2m,dew_point_2m,rain,snowfall,pressure_msl,cloud_cover,visibility,wind_speed_10m,wind_direction_10m,wind_gusts_10m&wind_speed_unit=kn&timezone=GMT&forecast_days=1";
+            
+            fetch(url)
+                .then(response => response.json())
+                .then(data => {
+                    const current_time = new Date().getUTCHours() + 1;
+                    const index = current_time;
+
+                    // Extract data
+                    const temperature = data.hourly.temperature_2m[index];
+                    const dew_point = data.hourly.dew_point_2m[index];
+                    const rain = data.hourly.rain[index];
+                    const snowfall = data.hourly.snowfall[index];
+                    const pressure = data.hourly.pressure_msl[index];
+                    const cloud_cover = data.hourly.cloud_cover[index];
+                    const visibility = data.hourly.visibility[index];
+                    const wind_speed = data.hourly.wind_speed_10m[index];
+                    const wind_direction = data.hourly.wind_direction_10m[index];
+                    const wind_gusts = data.hourly.wind_gusts_10m[index];
+
+                    // Format data
+                    const wind_direction_str = wind_direction.toString().padStart(3, '0');
+                    const wind_speed_str = Math.round(wind_speed).toString().padStart(2, '0');
+                    const wind_gusts_str = Math.round(wind_gusts).toString().padStart(2, '0');
+                    const visibility_meters = Math.round(visibility).toString().padStart(4, '0');
+
+                    const realtemp = Math.round(temperature);
+                    const realdew = Math.round(dew_point);
+                    const current_time_zulu = new Date().toISOString().substring(0, 16).replace(/-|:|T/g, '').substring(2) + "Z";
+
+                    // Create METAR string
+                    const metar_str = `METAR GB-0199 AUTO ${current_time_zulu} ${wind_direction_str}${wind_speed_str}KT ${realtemp}/${realdew} Q${Math.round(pressure)}`;
+
+                    // Display METAR string
+                    document.getElementById('metar-display').textContent = metar_str;
+                })
+                .catch(error => console.error('Error fetching weather data:', error));
+        }
+    </script>
+</body>
+</html>
